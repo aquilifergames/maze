@@ -11,7 +11,7 @@
 
     window.onload = function() {
 
-        var game = new Phaser.Game(800, 800, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
+        var game = new Phaser.Game(770, 770, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
         // 0 = wall | 1 = floor | 2 = safe zone
         var grid = [
         [2,0,1,0,0,0,0,0,0,0,0,0,0,0],
@@ -31,18 +31,33 @@
 
         ];
 
+        var map;
 
         function preload () {
             game.load.image('wallBlock', 'assets/stoneFloor.png');
             game.load.image('pathBlock', 'assets/woodfloor.jpg ');
             game.load.image('doorBlock', 'assets/greenzone.png');
+
+            game.load.tilemap('map', 'assets/map1.json', null, Phaser.Tilemap.TILED_JSON);
+            game.load.image('tiles', 'assets/tilesheet_complete.png');
         }
 
         function create () {
             var wallBlock = new Block('wallBlock', game.cache.getImage('wallBlock').width);
             var pathBlock = new Block('pathBlock', game.cache.getImage('pathBlock').width);
             var doorBlock = new Block('doorBlock', game.cache.getImage('doorBlock').width);
-           __createMazeBoard(wallBlock, pathBlock, doorBlock, grid.length);
+                game.stage.backgroundColor = '#787878';
+
+           map = game.add.tilemap('map',50,50);
+           map.addTilesetImage('tilesheet_complete', 'tiles');
+           //map.addTilesetImage('tilesheet_complete', 'tiles');
+
+           layer = map.createLayer(0);
+            map.createLayer(1);
+
+           
+
+           
         }
 
         function update () {
@@ -54,24 +69,6 @@
             this.size = size;
             this.imageKey = imageKey;
         }
-
-        /********** [ PRIVATE METHODS ] **********/
-        function __createMazeBoard(wallBlock, pathBlock, doorBlock, size){
-             for (var i = 0; i < size; i++) {
-                for (var j = 0; j < size; j++) {
-                    if (grid[j][i] == 0) {
-                        game.add.sprite(i * wallBlock.size, j * wallBlock.size, wallBlock.imageKey);
-                    }
-                    if (grid[j][i] == 1) {
-                        game.add.sprite(i * wallBlock.size, j * wallBlock.size, pathBlock.imageKey);
-                    }
-                    if (grid[j][i] == 2) {
-                        game.add.sprite(i * wallBlock.size, j * wallBlock.size, pathBlock.imageKey);
-                        game.add.sprite(i * doorBlock.size, j * doorBlock.size, doorBlock.imageKey);
-                    }
-                }
-            }
-        }//END
 
     };
 
