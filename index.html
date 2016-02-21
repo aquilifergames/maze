@@ -11,22 +11,19 @@
 
     window.onload = function() {
 
-        var game = new Phaser.Game(770, 770, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
+        var game = new Phaser.Game(770, 770, Phaser.CANVAS, '', { preload: preload, create: create, update: update, render: render});
         var map;
         var mainCharacter;
         var colissionLayer;
 
         function preload () {
             game.physics.startSystem(Phaser.Physics.ARCADE);
-
-
             game.load.tilemap('map', 'assets/map2.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image('mainCharacter', 'assets/ball.png');
             game.load.image('tiles', 'assets/tilesheet_complete.png');
         }
 
         function create () {
-
             map = game.add.tilemap('map');
             map.addTilesetImage('tilesheet_complete', 'tiles');
 
@@ -35,18 +32,15 @@
             map.setCollision([0,93], true, colissionLayer);
             game.physics.arcade.enable(colissionLayer);
 
-            mainCharacter =  game.add.sprite(70, 350, 'mainCharacter');
-            mainCharacter.anchor.x = mainCharacter.anchor.y = 0.2;
+            mainCharacter =  game.add.sprite(95, 95, 'mainCharacter');
             game.physics.arcade.enable(mainCharacter);
 
             mainCharacter.body.collideWorldBounds = true;
-            mainCharacter.body.setSize(30, 30);
-            mainCharacter.body.tilePadding.set(32, 32);
-        
+            mainCharacter.body.setSize(30,30);
+            mainCharacter.anchor.set(0.5);        
         }
 
         function update () {
-            game.debug.body(mainCharacter);
             game.physics.arcade.collide(mainCharacter, colissionLayer);
             cursors = game.input.keyboard.createCursorKeys();
 
@@ -54,23 +48,25 @@
             mainCharacter.body.velocity.y = 0;
 
             if (cursors.left.isDown) {
-                mainCharacter.body.velocity.x = -200;
+                mainCharacter.body.velocity.x = -150;
             }
 
-           if (cursors.right.isDown)
-            {
-                mainCharacter.body.velocity.x = 200;
+            if (cursors.right.isDown) {
+                mainCharacter.body.velocity.x = 150;
             }
 
-            if (cursors.up.isDown)
-            {
-                mainCharacter.body.velocity.y = -200;
+            if (cursors.up.isDown) {
+                mainCharacter.body.velocity.y = -150;
             }
-             if (cursors.down.isDown)
-            {
-                 mainCharacter.body.velocity.y = 200;   
-            
+
+            if (cursors.down.isDown) {
+                 mainCharacter.body.velocity.y = 150;   
             }
+        }
+
+        function render () {
+           game.debug.body(mainCharacter);
+        
         }
     };
 
