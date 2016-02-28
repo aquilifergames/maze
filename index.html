@@ -22,13 +22,7 @@
         var mainCharacter;
         var colissionLayer;
 
-        // the canvas where we will show the obstaclesCanvas
-        var obstaclesCanvas;
-        // the canvas where we will show the light
         var lightCanvas;
-        // number of boxes on the stage
-        var numBoxes = 15;
-        // array which will store all polygons
         var polygons = [];
 
         function preload() {
@@ -44,23 +38,6 @@
             map.createLayer('fondo');
             colissionLayer = map.createLayer('colision');
 
-            for (var y = 0; y < map.height; ++y) {
-                for (var x = 0; x < map.width; ++x) {
-                    var tile = map.getTile(x, y, "colision");
-                    if (tile != null) {
-                        console.log(tile);
-
-                        polygons.push([
-                            [tile.worldX, tile.worldY],
-                            [tile.worldX + tile.width, tile.worldY],
-                            [tile.worldX + tile.width, tile.worldY + tile.height],
-                            [tile.worldX, tile.worldY + tile.height]
-                        ]);
-
-                    }
-                }
-            }
-
             map.setCollision([0, 93], true, colissionLayer);
             game.physics.arcade.enable(colissionLayer);
 
@@ -71,22 +48,9 @@
             mainCharacter.body.setSize(30, 30);
             mainCharacter.anchor.set(0.5);
 
-            // listener to mouse movement       
-            moveIndex = game.input.addMoveCallback(move, this);
-            // the canvas where we will show the obstaclesCanvas
-            obstaclesCanvas = game.add.graphics(0, 0);
-            // line style of obstacle canvas
-            obstaclesCanvas.lineStyle(4, 0xffffff, 1);
+            pushBlocks();
             // the canvas where we will display the scene
             lightCanvas = game.add.graphics(0, 0);
-            
-            // placing the perimeter box
-            polygons.push([
-                [-1, -1],
-                [game.width + 1, -1],
-                [game.width + 1, game.height + 1],
-                [-1, game.height + 1]
-            ]);
         }
 
         function update() {
@@ -95,36 +59,38 @@
 
             mainCharacter.body.velocity.x = 0;
             mainCharacter.body.velocity.y = 0;
+            velocity = 250;
 
             if (cursors.left.isDown) {
-                mainCharacter.body.velocity.x = -150;
+                mainCharacter.body.velocity.x = -velocity;
             }
 
             if (cursors.right.isDown) {
-                mainCharacter.body.velocity.x = 150;
+                mainCharacter.body.velocity.x = velocity;
             }
 
             if (cursors.up.isDown) {
-                mainCharacter.body.velocity.y = -150;
+                mainCharacter.body.velocity.y = -velocity;
             }
 
             if (cursors.down.isDown) {
-                mainCharacter.body.velocity.y = 150;
+                mainCharacter.body.velocity.y = velocity;
             }
+
+            move(mainCharacter);
         }
 
         function render() {
             game.debug.body(mainCharacter);
-
         }
 
         function move() {
             // when the mouse is moved, we determine the new visibility polygon     
-            var visibility = createLightPolygon(game.input.worldX, game.input.worldY);
+            var visibility = createLightPolygon(mainCharacter.x, mainCharacter.y);
             // then we draw it
             lightCanvas.clear();
-            lightCanvas.lineStyle(2, 0xff8800, 1);
-            lightCanvas.beginFill(0xffff00);
+            lightCanvas.lineStyle(0, 0xff8800);
+            lightCanvas.beginFill(0xffffff, 0.6);
             lightCanvas.moveTo(visibility[0][0], visibility[0][1]);
             for (var i = 1; i <= visibility.length; i++) {
                 lightCanvas.lineTo(visibility[i % visibility.length][0], visibility[i % visibility.length][1]);
@@ -142,6 +108,31 @@
                 return VisibilityPolygon.compute(position, segments);
             }
             return null;
+        }
+
+        function pushBlocks() {
+            for (var y = 0; y < map.height; ++y) {
+                for (var x = 0; x < map.width; ++x) {
+                    var tile = map.getTile(x, y, "colision");
+                    if (tile != null) {
+                        polygons.push([
+                            [tile.worldX, tile.worldY],
+                            [tile.worldX + tile.width, tile.worldY],
+                            [tile.worldX + tile.width, tile.worldY + tile.height],
+                            [tile.worldX, tile.worldY + tile.height]
+                        ]);
+
+                    }
+                }
+            }
+
+            //Set perimetral view
+            polygons.push([
+                [-1, -1],
+                [game.width + 1, -1],
+                [game.width + 1, game.height + 1],
+                [-1, game.height + 1]
+            ]);
         }
     };
     </script>
