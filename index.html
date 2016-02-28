@@ -15,11 +15,14 @@
         var map;
         var mainCharacter;
         var colissionLayer;
+        var safeZones;
+        var background;
 
         function preload () {
             game.physics.startSystem(Phaser.Physics.ARCADE);
-            game.load.tilemap('map', 'assets/map2.json', null, Phaser.Tilemap.TILED_JSON);
+            game.load.tilemap('map', 'assets/map3.json', null, Phaser.Tilemap.TILED_JSON);
             game.load.image('mainCharacter', 'assets/ball.png');
+            game.load.image('szone', 'assets/greenFire.png');
             game.load.image('tiles', 'assets/tilesheet_complete.png');
         }
 
@@ -27,10 +30,16 @@
             map = game.add.tilemap('map');
             map.addTilesetImage('tilesheet_complete', 'tiles');
 
-            map.createLayer('fondo');
+            background = map.createLayer('fondo');
             colissionLayer = map.createLayer('colision');
             map.setCollision([0,93], true, colissionLayer);
             game.physics.arcade.enable(colissionLayer);
+
+            safeZones = game.add.group();
+            safeZones.enableBody = true;
+
+            //  And now we convert all of the Tiled objects with an ID of 34 into sprites within the coins group
+            map.createFromObjects('zona-carga', 401, 'szone', 0, true, false, safeZones);
 
             mainCharacter =  game.add.sprite(95, 95, 'mainCharacter');
             game.physics.arcade.enable(mainCharacter);
@@ -42,6 +51,7 @@
 
         function update () {
             game.physics.arcade.collide(mainCharacter, colissionLayer);
+            game.physics.arcade.overlap(mainCharacter, safeZones, charge, null, this);
             cursors = game.input.keyboard.createCursorKeys();
 
             mainCharacter.body.velocity.x = 0;
@@ -66,8 +76,12 @@
 
         function render () {
            game.debug.body(mainCharacter);
+           game.debug.body(safeZones);
         
         }
+        function charge(){console.log("charging");}
+
+        function discharge(){console.log("discharging");}
     };
 
     </script>
