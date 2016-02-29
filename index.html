@@ -23,6 +23,7 @@
         var colissionLayer;
 
         var lightCanvas;
+        var background;
         var polygons = [];
 
         function preload() {
@@ -35,7 +36,7 @@
         function create() {
             map = game.add.tilemap('map');
             map.addTilesetImage('tilesheet_complete', 'tiles');
-            map.createLayer('fondo');
+            background = map.createLayer('fondo');
             colissionLayer = map.createLayer('colision');
 
             map.setCollision([0, 93], true, colissionLayer);
@@ -51,6 +52,8 @@
             pushBlocks();
             // the canvas where we will display the scene
             lightCanvas = game.add.graphics(0, 0);
+            background.mask = lightCanvas;
+            colissionLayer.mask = lightCanvas;
         }
 
         function update() {
@@ -78,6 +81,7 @@
             }
 
             move(mainCharacter);
+            background.alpha = 0.5 + Math.random() * 0.5;
         }
 
         function render() {
@@ -89,8 +93,9 @@
             var visibility = createLightPolygon(mainCharacter.x, mainCharacter.y);
             // then we draw it
             lightCanvas.clear();
-            lightCanvas.lineStyle(0, 0xff8800);
-            lightCanvas.beginFill(0xffffff, 0.6);
+
+            lightCanvas.lineStyle(2, 0xffffff, 1);
+            lightCanvas.beginFill(0xffff00);
             lightCanvas.moveTo(visibility[0][0], visibility[0][1]);
             for (var i = 1; i <= visibility.length; i++) {
                 lightCanvas.lineTo(visibility[i % visibility.length][0], visibility[i % visibility.length][1]);
