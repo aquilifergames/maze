@@ -29,6 +29,11 @@
         var background;
         var polygons = [];
 
+        var light = 200;
+        var lightText;
+
+        var gameOver = false;
+
         function preload() {
             game.time.advancedTiming = true;
             game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -54,6 +59,7 @@
             safeZones.enableBody = true;
             map.createFromObjects('zona-carga', 401, 'szone', 0, true, false, safeZones);
 
+
             exit = game.add.group();
             exit.enableBody=true;
             map.createFromObjects('exit', 20, 'exit', 0, true, false, exit);
@@ -72,6 +78,12 @@
             lightCanvas = game.add.graphics(0, 0);
             background.mask = lightCanvas;
             colissionLayer.mask = lightCanvas;
+            safeZones.mask = lightCanvas;
+            exit.mask = lightCanvas;
+
+            game.time.events.loop(500, updateLight, this);
+
+            lightText = game.add.text(game.world.centerX - 200,5    , 'Remaining Light 300', { font: "25px Arial", fill: "#ffffff", align: "top" });
         }
 
         function update() {
@@ -104,6 +116,12 @@
             //background.alpha = 0.5 + Math.random() * 0.5;
         }
 
+        function updateLight(){
+            light = light -10;
+            lightText.setText('Remaining Light ' + light);
+            if(light == 0) gameOver = true;
+        }
+
         function render() {
             //game.debug.body(mainCharacter);
             move(mainCharacter);
@@ -123,9 +141,12 @@
             }
             lightCanvas.endFill();
         }
-        function charge(){console.log("charging");}
-
-        function discharge(){console.log("discharging");}
+        function charge(){
+            if (light <= 200) {
+                light += 10;    
+            }
+            
+        }
 
         function finishLevel(){console.log("finishLevel");}
 
@@ -133,7 +154,7 @@
         // from an array of polygons and a source point
         function createLightPolygon(x, y) {
             var segments = VisibilityPolygon.convertToSegments(polygons);
-            segments = VisibilityPolygon.breakIntersections(segments);
+            //segments = VisibilityPolygon.breakIntersections(segments);
             var position = [x, y];
             ////if (VisibilityPolygon.inPolygon(position, polygons[polygons.length - 1])) {
              //   return VisibilityPolygon.compute(position, segments);
@@ -158,12 +179,12 @@
             }
 
             //Set perimetral view
-            polygons.push([
-                [-1, -1],
-                [game.width + 1, -1],
-                [game.width + 1, game.height + 1],
-                [-1, game.height + 1]
-            ]);
+            //polygons.push([
+             //   [-1, -1],
+              //  [game.width + 1, -1],
+              //  [game.width + 1, game.height + 1],
+              //  [-1, game.height + 1]
+           // ]);
         }
     };
     </script>
